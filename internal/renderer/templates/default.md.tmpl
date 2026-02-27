@@ -10,9 +10,9 @@
 
 {{- end }}
 
-{{- if or .Profile.Blog .Profile.Twitter }}
+{{- if or .Profile.Blog .Profile.SocialAccounts }}
 
-{{ if .Profile.Blog }}[![Blog](https://img.shields.io/badge/Blog-{{ urlPathEscape .Profile.Blog }}-blue?style=for-the-badge&logo=google-chrome&logoColor=white)]({{ .Profile.Blog }}){{ end }} {{ if .Profile.Twitter }}[![Twitter](https://img.shields.io/badge/@{{ .Profile.Twitter }}-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/{{ .Profile.Twitter }}){{ end }}
+{{ if .Profile.Blog }}[![Blog](https://img.shields.io/badge/Blog-blue?style=for-the-badge&logo=google-chrome&logoColor=white)]({{ .Profile.Blog }}){{ end }}{{ range .Profile.SocialAccounts }} [![{{ .DisplayName }}]({{ .SocialBadge }})]({{ .URL }}){{ end }}
 
 {{- end }}
 
