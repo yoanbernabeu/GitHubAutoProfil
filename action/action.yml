@@ -1,0 +1,50 @@
+name: 'GitHubAutoProfil'
+description: 'Auto-generate your GitHub profile README from your repos and activity'
+branding:
+  icon: 'user'
+  color: 'blue'
+
+inputs:
+  github_token:
+    description: 'GitHub token with repo scope'
+    required: true
+  username:
+    description: 'GitHub username'
+    required: true
+  top:
+    description: 'Number of top projects to display'
+    required: false
+    default: '5'
+  version:
+    description: 'GitHubAutoProfil version to use (e.g. v1.0.0 or latest)'
+    required: false
+    default: 'latest'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install GitHubAutoProfil
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        VERSION="${{ inputs.version }}"
+        if [ "$VERSION" = "latest" ]; then
+          VERSION=$(gh release view --repo yoanbernabeu/GitHubAutoProfil --json tagName -q '.tagName')
+        fi
+        OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+        ARCH=$(uname -m)
+        [ "$ARCH" = "x86_64" ] && ARCH="amd64"
+        [ "$ARCH" = "aarch64" ] && ARCH="arm64"
+        URL="https://github.com/yoanbernabeu/GitHubAutoProfil/releases/download/${VERSION}/GitHubAutoProfil_${OS}_${ARCH}.tar.gz"
+        curl -sL "$URL" | tar xz -C /usr/local/bin githubautoprofil
+
+    - name: Generate and push README
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: |
+        githubautoprofil generate \
+          --username ${{ inputs.username }} \
+          --top ${{ inputs.top }} \
+          --push
